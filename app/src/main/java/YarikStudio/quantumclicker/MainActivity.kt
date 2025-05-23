@@ -2,6 +2,7 @@ package YarikStudio.quantumclicker
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import android.graphics.Color
@@ -44,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         val electron: Button = findViewById(R.id.Electron)
         var protonPrice: Long = 150
         var electronPrice: Long = 100
-        var autoclick: Long = 0
+        var pointsForElectrons: Long = 0
         proton.text = "buy proton ($protonPrice)"
         electron.text = "buy electron ($electronPrice)"
         val details: ImageView = findViewById(R.id.Details)
@@ -59,8 +60,9 @@ class MainActivity : AppCompatActivity() {
         }
 
             details.setOnClickListener {
-                setContentView(R.layout.activity_details)
                 soundPool.play(soundId, 1.0f, 1.0f, 1, 0, 0.5f)
+                val intent = Intent(this, Details::class.java)
+                startActivity(intent)
             }
 
         fun formatNumberWithSpaces(number: Long): String {
@@ -71,7 +73,6 @@ class MainActivity : AppCompatActivity() {
 
         fun updatePoints() {
             points.text = formatNumberWithSpaces(money).toString()
-
         }
 
         proton.setOnClickListener {
@@ -100,10 +101,10 @@ class MainActivity : AppCompatActivity() {
         electron.setOnClickListener {
             if (money >= electronPrice) {
                 money -= electronPrice
-                if (autoclick > 0)
-                    autoclick *= 2
+                if (pointsForElectrons > 0)
+                    pointsForElectrons *= 2
                 else
-                    autoclick = 4
+                    pointsForElectrons = 4
                 electronPrice *= 2
                 electron.text = "buy electron \n(" + formatNumberWithSpaces(electronPrice) + ")"
                 updatePoints()
@@ -123,8 +124,8 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        fun autoclick() {
-            money += autoclick
+        fun pointsForElectrons() {
+            money += pointsForElectrons
             updatePoints()
         }
 
@@ -299,7 +300,7 @@ class MainActivity : AppCompatActivity() {
             delay(4000)
             while (true) {
                 delay(Random.nextInt(600, 1200).toLong())
-                autoclick()
+                pointsForElectrons()
             }
         }
 
