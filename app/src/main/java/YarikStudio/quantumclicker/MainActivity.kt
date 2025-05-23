@@ -30,28 +30,38 @@ import kotlin.math.ceil
 import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
+
+    val intent = Intent(this, Details::class.java)
+    val layout: ConstraintLayout = findViewById(R.id.main)
+    val coin: ImageView = findViewById(R.id.Coin)
+    var points: TextView = findViewById(R.id.Points)
+    var money: Long = 999999
+    val proton: Button = findViewById(R.id.Proton)
+    val electron: Button = findViewById(R.id.Electron)
+    var protonPrice: Long = 150
+    var electronPrice: Long = 100
+    var pointsForClick: Long = 1
+    var pointsForElectrons: Int = 0
+    var numberOfProtons: Short = 0
+    var numberOfElectrons: Short = 0
+    var numberOfNeutrons: Short = 0
+    var numberOfClicks: Short = 0
+    val details: ImageView = findViewById(R.id.Details)
+    val soundPool = SoundPool.Builder().setMaxStreams(5).build()
+    val soundId = soundPool.load(this, R.raw.quantum_clicker_clickaudio, 1)
+    val Energy: ImageView = findViewById(R.id.Energy)
+
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-        val layout: ConstraintLayout = findViewById(R.id.main)
-        val coin: ImageView = findViewById(R.id.Coin)
-        var points: TextView = findViewById(R.id.Points)
-        var money: Long = 999999
-        var pointsForClick: Long = 1
-        val proton: Button = findViewById(R.id.Proton)
-        val electron: Button = findViewById(R.id.Electron)
-        var protonPrice: Long = 150
-        var electronPrice: Long = 100
-        var pointsForElectrons: Long = 0
+        intent.putExtra("pointsForClick", pointsForClick)
+        startActivity(intent)
+
         proton.text = "buy proton ($protonPrice)"
         electron.text = "buy electron ($electronPrice)"
-        val details: ImageView = findViewById(R.id.Details)
-        val soundPool = SoundPool.Builder().setMaxStreams(5).build()
-        val soundId = soundPool.load(this, R.raw.quantum_clicker_clickaudio, 1)
-        val Energy: ImageView = findViewById(R.id.Energy)
         Energy.alpha = 0f
 
         window.attributes = window.attributes.apply {
@@ -77,6 +87,7 @@ class MainActivity : AppCompatActivity() {
 
         proton.setOnClickListener {
             if (money >= protonPrice) {
+                numberOfProtons++
                 money -= protonPrice
                 pointsForClick *= 2
                 protonPrice *= 2
@@ -99,6 +110,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         electron.setOnClickListener {
+            numberOfElectrons++
             if (money >= electronPrice) {
                 money -= electronPrice
                 if (pointsForElectrons > 0)
@@ -130,6 +142,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         fun spawnEnergy() {
+            numberOfNeutrons++
             layout.post {
                 val energy = ImageView(this).apply {
                     layoutParams = Energy.layoutParams.run {
@@ -208,6 +221,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         fun click() {
+            pointsForClickTextUpdate()
+            numberOfClicks++
             money += pointsForClick
             updatePoints()
             soundPool.play(soundId, 1.0f, 1.0f, 0, 0, 1.0f)
