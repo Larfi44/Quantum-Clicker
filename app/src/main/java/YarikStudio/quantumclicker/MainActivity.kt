@@ -16,7 +16,6 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.core.animate
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
@@ -26,30 +25,30 @@ import kotlinx.coroutines.launch
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
-import kotlin.math.ceil
 import kotlin.random.Random
 
 class MainActivity : AppCompatActivity() {
 
-    val intent = Intent(this, Details::class.java)
-    val layout: ConstraintLayout = findViewById(R.id.main)
-    val coin: ImageView = findViewById(R.id.Coin)
-    var points: TextView = findViewById(R.id.Points)
-    var money: Long = 999999
-    val proton: Button = findViewById(R.id.Proton)
-    val electron: Button = findViewById(R.id.Electron)
-    var protonPrice: Long = 150
-    var electronPrice: Long = 100
-    var pointsForClick: Long = 1
-    var pointsForElectrons: Int = 0
-    var numberOfProtons: Short = 0
-    var numberOfElectrons: Short = 0
-    var numberOfNeutrons: Short = 0
-    var numberOfClicks: Short = 0
-    val details: ImageView = findViewById(R.id.Details)
-    val soundPool = SoundPool.Builder().setMaxStreams(5).build()
-    val soundId = soundPool.load(this, R.raw.quantum_clicker_clickaudio, 1)
-    val Energy: ImageView = findViewById(R.id.Energy)
+    private lateinit var intent: Intent
+    private lateinit var layout: ConstraintLayout
+    private lateinit var coin: ImageView
+    private lateinit var points: TextView
+    private lateinit var proton: Button
+    private lateinit var electron: Button
+    private lateinit var details: ImageView
+    private lateinit var Energy: ImageView
+
+    private var money: Long = 999999999
+    private var protonPrice: Long = 150
+    private var electronPrice: Long = 100
+    private var pointsForClick: Long = 1
+    private var pointsForElectrons: Int = 0
+    private var numberOfProtons: Short = 0
+    private var numberOfElectrons: Short = 0
+    private var numberOfNeutrons: Short = 0
+    private var numberOfClicks: Short = 0
+    private lateinit var soundPool: SoundPool
+    private var soundId: Int = 0
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -57,8 +56,18 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-        intent.putExtra("pointsForClick", pointsForClick)
-        startActivity(intent)
+        layout = findViewById(R.id.main)
+        coin = findViewById(R.id.Coin)
+        points = findViewById(R.id.Points)
+        proton = findViewById(R.id.Proton)
+        electron = findViewById(R.id.Electron)
+        details = findViewById(R.id.Details)
+        Energy = findViewById(R.id.Energy)
+
+        intent = Intent(this, Details::class.java)
+
+        soundPool = SoundPool.Builder().setMaxStreams(5).build()
+        soundId = soundPool.load(this, R.raw.quantum_clicker_clickaudio, 1)
 
         proton.text = "buy proton ($protonPrice)"
         electron.text = "buy electron ($electronPrice)"
@@ -71,7 +80,12 @@ class MainActivity : AppCompatActivity() {
 
             details.setOnClickListener {
                 soundPool.play(soundId, 1.0f, 1.0f, 1, 0, 0.5f)
-                val intent = Intent(this, Details::class.java)
+                intent.putExtra("pointsForClick", pointsForClick.toString())
+                intent.putExtra("pointsForElectrons", pointsForElectrons.toString())
+                intent.putExtra("numberOfProtons", numberOfProtons.toString())
+                intent.putExtra("numberOfElectrons", numberOfElectrons.toString())
+                intent.putExtra("numberOfNeutrons", numberOfNeutrons.toString())
+                intent.putExtra("numberOfClicks", numberOfClicks.toString())
                 startActivity(intent)
             }
 
@@ -88,6 +102,7 @@ class MainActivity : AppCompatActivity() {
         proton.setOnClickListener {
             if (money >= protonPrice) {
                 numberOfProtons++
+                intent.putExtra("numberOfProtons", numberOfProtons)
                 money -= protonPrice
                 pointsForClick *= 2
                 protonPrice *= 2
@@ -221,7 +236,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         fun click() {
-            pointsForClickTextUpdate()
             numberOfClicks++
             money += pointsForClick
             updatePoints()
