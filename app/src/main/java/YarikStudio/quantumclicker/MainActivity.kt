@@ -37,8 +37,9 @@ class MainActivity : AppCompatActivity() {
     private lateinit var electron: Button
     private lateinit var details: ImageView
     private lateinit var Energy: ImageView
+    private lateinit var soundPool: SoundPool
 
-    private var money: Long = 999999999
+    private var money: Long = 0
     private var protonPrice: Long = 150
     private var electronPrice: Long = 100
     private var pointsForClick: Long = 1
@@ -47,8 +48,8 @@ class MainActivity : AppCompatActivity() {
     private var numberOfElectrons: Short = 0
     private var numberOfNeutrons: Short = 0
     private var numberOfClicks: Short = 0
-    private lateinit var soundPool: SoundPool
     private var soundId: Int = 0
+    private var pointsForNextTeleport: Short? = null
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,7 +65,7 @@ class MainActivity : AppCompatActivity() {
         details = findViewById(R.id.Details)
         Energy = findViewById(R.id.Energy)
 
-        intent = Intent(this, Details::class.java)
+        val intent = Intent(this, Details::class.java)
 
         soundPool = SoundPool.Builder().setMaxStreams(5).build()
         soundId = soundPool.load(this, R.raw.quantum_clicker_clickaudio, 1)
@@ -156,10 +157,10 @@ class MainActivity : AppCompatActivity() {
             updatePoints()
         }
 
-        fun spawnEnergy() {
+        fun spawnNeutron() {
             numberOfNeutrons++
             layout.post {
-                val energy = ImageView(this).apply {
+                val neutron = ImageView(this).apply {
                     layoutParams = Energy.layoutParams.run {
                         ViewGroup.LayoutParams(width, height)
                     }
@@ -167,27 +168,32 @@ class MainActivity : AppCompatActivity() {
                     layout.addView(this)
                 }
                 val randomX = Random.nextInt(0, layout.width - Energy.width).toFloat()
-                energy.x = randomX
-                energy.y = 0f
-                energy.scaleX = 1f
-                energy.scaleY = 1f
-                energy.animate().alpha(1f).setDuration(500).start()
-                        energy.animate()
-                            .y((layout.height - energy.height - 450).toFloat())
+                neutron.x = randomX
+                neutron.y = 0f
+                neutron.scaleX = 1f
+                neutron.scaleY = 1f
+                neutron.animate().alpha(1f).setDuration(500).start()
+                        neutron.animate()
+                            .y((layout.height - neutron.height - 450).toFloat())
                             .rotationBy(Random.nextInt(360, 1200).toFloat())
                             .setDuration(Random.nextInt(2500, 4000).toLong())
                             .withEndAction {
-                                energy.animate()
+                                neutron.animate()
                                     .alpha(0f)
                                     .setDuration(200)
+                                    .withEndAction {
+                                        layout.removeView(neutron)
+                                    }
                                     .start()
                     }
                     .start()
-                energy.setOnClickListener {
+                neutron.setOnClickListener {
                     it.isClickable = false
-                    energy.animate().cancel()
+                    neutron.animate().cancel()
                     soundPool.play(soundId, 1.0f, 1.0f, 1, 0, 1.25f)
-                    energy.animate().alpha(0f).scaleX(2.5f).scaleY(2.5f).setDuration(400).start()
+                    neutron.animate().alpha(0f).scaleX(2.5f).scaleY(2.5f).setDuration(400).withEndAction {
+                        layout.removeView(neutron)
+                    }.start()
                     money += pointsForClick * Random.nextInt(5, 31)
                     updatePoints()
                 }
@@ -303,6 +309,10 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        fun nextTeleport() {
+            pointsForNextTeleport = Random.nextInt(25,150).toShort()
+        }
+
         coin.visibility = View.GONE
         points.visibility = View.GONE
         proton.visibility = View.GONE
@@ -321,7 +331,7 @@ class MainActivity : AppCompatActivity() {
             delay(4000)
             while (true) {
                 delay(Random.nextInt(1000, 22000).toLong())
-                spawnEnergy()
+                spawnNeutron()
             }
         }
 
@@ -335,6 +345,7 @@ class MainActivity : AppCompatActivity() {
 
         logo()
         layout.setOnClickListener {click()}
+        nextTeleport()
 
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
