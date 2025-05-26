@@ -19,19 +19,6 @@
         app:srcCompat="@drawable/quantum_coin" />
 
     <TextView
-        android:id="@+id/EndText"
-        android:layout_width="350dp"
-        android:layout_height="187dp"
-        android:gravity="center"
-        android:text="The End!\nThanks for playing!\n By Yarik Studio"
-        android:textSize="30sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
         android:id="@+id/Points"
         android:layout_width="350dp"
         android:layout_height="80dp"
@@ -259,8 +246,8 @@
 
     <TextView
         android:id="@+id/FireWorld"
-        android:layout_width="394dp"
-        android:layout_height="39dp"
+        android:layout_width="387dp"
+        android:layout_height="60dp"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
         android:text="Fire World (more point for click)"
@@ -291,11 +278,11 @@
 
     <TextView
         android:id="@+id/ChaosWorld"
-        android:layout_width="394dp"
-        android:layout_height="39dp"
+        android:layout_width="396dp"
+        android:layout_height="71dp"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
-        android:text="Chaos World (Random points for click)"
+        android:text="Chaos World \n(Random points for click)"
         android:textSize="23sp"
         android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -311,14 +298,28 @@
         android:layout_height="77dp"
         android:layout_marginStart="5dp"
         android:layout_marginTop="5dp"
-        android:text="Dark World (It's difficult to click on the quantum)"
+        android:text="Dark World (It's difficult\nto click on the quantum)"
         android:textSize="25sp"
-        android:visibility="gone"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.0" />
+
+    <TextView
+        android:id="@+id/EndText"
+        android:layout_width="350dp"
+        android:layout_height="187dp"
+        android:gravity="center"
+        android:text="The End!\nThanks for playing!\n By Yarik Studio"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:elevation="4dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

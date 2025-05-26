@@ -51,10 +51,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var darkWorld: TextView
     private lateinit var endText: TextView
 
-    private var money: Long = 999_999_999_999_999_999
+    private var money: Long = 0
     private var protonPrice: Long = 150
     private var electronPrice: Long = 100
-    private var pointsForClick: Long = 100_000_000_000_000_000
+    private var pointsForClick: Long = 1
     private var pointsForElectrons: Long = 0
     private var numberOfProtons: Short = 0
     private var numberOfElectrons: Short = 0
