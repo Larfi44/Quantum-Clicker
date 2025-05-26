@@ -19,6 +19,19 @@
         app:srcCompat="@drawable/quantum_coin" />
 
     <TextView
+        android:id="@+id/EndText"
+        android:layout_width="350dp"
+        android:layout_height="187dp"
+        android:gravity="center"
+        android:text="The End!\nThanks for playing!\n By Yarik Studio"
+        android:textSize="30sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
         android:id="@+id/Points"
         android:layout_width="350dp"
         android:layout_height="80dp"

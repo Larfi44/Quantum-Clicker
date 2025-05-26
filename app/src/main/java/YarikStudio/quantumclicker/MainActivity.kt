@@ -1,6 +1,7 @@
 package YarikStudio.quantumclicker
 
 import android.annotation.SuppressLint
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
@@ -34,7 +35,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var intent: Intent
     private lateinit var layout: ConstraintLayout
-    private lateinit var coin: ImageView
+    private lateinit var quantum: ImageView
     private lateinit var proton: Button
     private lateinit var electron: Button
     private lateinit var details: ImageView
@@ -48,11 +49,12 @@ class MainActivity : AppCompatActivity() {
     private lateinit var iceWorld: TextView
     private lateinit var chaosWorld: TextView
     private lateinit var darkWorld: TextView
+    private lateinit var endText: TextView
 
-    private var money: Long = 0
+    private var money: Long = 999_999_999_999_999_999
     private var protonPrice: Long = 150
     private var electronPrice: Long = 100
-    private var pointsForClick: Long = 1
+    private var pointsForClick: Long = 100_000_000_000_000_000
     private var pointsForElectrons: Long = 0
     private var numberOfProtons: Short = 0
     private var numberOfElectrons: Short = 0
@@ -60,8 +62,10 @@ class MainActivity : AppCompatActivity() {
     private var numberOfClicks: Short = 0
     private var soundId1: Int = 0
     private var soundId2: Int = 0
+    private var soundId3: Int = 0
     private var pointsForNextTeleport: UByte = 0U
     private var world: UByte = 99u
+    private var end: Boolean = false
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,7 +74,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         layout = findViewById(R.id.main)
-        coin = findViewById(R.id.Coin)
+        quantum = findViewById(R.id.Coin)
         points = findViewById(R.id.Points)
         proton = findViewById(R.id.Proton)
         electron = findViewById(R.id.Electron)
@@ -83,16 +87,19 @@ class MainActivity : AppCompatActivity() {
         iceWorld = findViewById(R.id.IceWorld)
         chaosWorld = findViewById(R.id.ChaosWorld)
         darkWorld = findViewById(R.id.DarkWorld)
+        endText = findViewById(R.id.EndText)
 
         intent = Intent(this, Details::class.java)
 
         soundPool = SoundPool.Builder().setMaxStreams(5).build()
         soundId1 = soundPool.load(this, R.raw.quantum_clicker_clickaudio, 1)
         soundId2 = soundPool.load(this, R.raw.teleport, 1)
+        soundId3 = soundPool.load(this, R.raw.explosion, 1)
 
         proton.text = "buy proton ($protonPrice)"
         electron.text = "buy electron ($electronPrice)"
         Energy.alpha = 0f
+        endText.alpha = 0f
         fire.visibility = View.GONE
         snowflake.visibility = View.GONE
         chaos.visibility = View.GONE
@@ -112,16 +119,27 @@ class MainActivity : AppCompatActivity() {
             return formatter.format(number).replace(",", " ")
         }
 
-            details.setOnClickListener {
+        details.setOnClickListener {
+            if (!end) {
                 soundPool.play(soundId1, 1.0f, 1.0f, 1, 0, 0.5f)
                 intent.putExtra("pointsForClick", formatNumberWithSpaces(pointsForClick).toString())
-                intent.putExtra("pointsForElectrons", formatNumberWithSpaces(pointsForElectrons).toString())
+                intent.putExtra(
+                    "pointsForElectrons",
+                    formatNumberWithSpaces(pointsForElectrons).toString()
+                )
                 intent.putExtra("numberOfProtons", numberOfProtons.toString())
                 intent.putExtra("numberOfElectrons", numberOfElectrons.toString())
-                intent.putExtra("numberOfNeutrons", formatNumberWithSpaces(numberOfNeutrons.toLong()).toString())
-                intent.putExtra("numberOfClicks", formatNumberWithSpaces(numberOfClicks.toLong()).toString())
+                intent.putExtra(
+                    "numberOfNeutrons",
+                    formatNumberWithSpaces(numberOfNeutrons.toLong()).toString()
+                )
+                intent.putExtra(
+                    "numberOfClicks",
+                    formatNumberWithSpaces(numberOfClicks.toLong()).toString()
+                )
                 startActivity(intent)
             }
+        }
 
         fun updatePoints() {
             points.text = formatNumberWithSpaces(money).toString()
@@ -200,27 +218,28 @@ class MainActivity : AppCompatActivity() {
                 neutron.scaleX = 1f
                 neutron.scaleY = 1f
                 neutron.animate().alpha(1f).setDuration(500).start()
+                neutron.animate()
+                    .y((layout.height - neutron.height - 450).toFloat())
+                    .rotationBy(Random.nextInt(360, 1200).toFloat())
+                    .setDuration(Random.nextInt(2500, 4000).toLong())
+                    .withEndAction {
                         neutron.animate()
-                            .y((layout.height - neutron.height - 450).toFloat())
-                            .rotationBy(Random.nextInt(360, 1200).toFloat())
-                            .setDuration(Random.nextInt(2500, 4000).toLong())
+                            .alpha(0f)
+                            .setDuration(200)
                             .withEndAction {
-                                neutron.animate()
-                                    .alpha(0f)
-                                    .setDuration(200)
-                                    .withEndAction {
-                                        layout.removeView(neutron)
-                                    }
-                                    .start()
+                                layout.removeView(neutron)
+                            }
+                            .start()
                     }
                     .start()
                 neutron.setOnClickListener {
                     it.isClickable = false
                     neutron.animate().cancel()
                     soundPool.play(soundId1, 1.0f, 1.0f, 1, 0, 1.25f)
-                    neutron.animate().alpha(0f).scaleX(2.5f).scaleY(2.5f).setDuration(400).withEndAction {
-                        layout.removeView(neutron)
-                    }.start()
+                    neutron.animate().alpha(0f).scaleX(2.5f).scaleY(2.5f).setDuration(400)
+                        .withEndAction {
+                            layout.removeView(neutron)
+                        }.start()
                     money += pointsForClick * Random.nextInt(5, 31)
                     updatePoints()
                 }
@@ -264,12 +283,12 @@ class MainActivity : AppCompatActivity() {
 
         fun nextTeleport() {
             world = 0u
-            pointsForNextTeleport = Random.nextInt(20,200).toUByte()
+            pointsForNextTeleport = Random.nextInt(20, 200).toUByte()
             fire.visibility = View.GONE
             snowflake.visibility = View.GONE
             chaos.visibility = View.GONE
             points.setTextColor(Color.BLACK)
-            coin.alpha = 1f
+            quantum.alpha = 1f
             fireWorld.visibility = View.GONE
             iceWorld.visibility = View.GONE
             chaosWorld.visibility = View.GONE
@@ -290,25 +309,27 @@ class MainActivity : AppCompatActivity() {
                 electron.setTextColor(Color.WHITE)
             }
         }
+
         fun newTeleport() {
             world = Random.nextInt(1, 5).toUByte()
             soundPool.play(soundId2, 2.0f, 2.0f, 5, 0, 1f)
             if (world.toUInt() == 1u) {
                 layout.setBackgroundColor(Color.RED)
-                fire.visibility = View.VISIBLE
                 proton.setBackgroundColor(Color.parseColor("#FFFFA500"))
                 electron.setBackgroundColor(Color.parseColor("#FFFFA500"))
                 points.setTextColor(Color.WHITE)
+                fire.visibility = View.VISIBLE
                 fireWorld.visibility = View.VISIBLE
                 fireWorld.setTextColor(Color.WHITE)
             }
             if (world.toUInt() == 2u) {
                 layout.setBackgroundColor(Color.parseColor("#FF00FFFF"))
-                snowflake.visibility = View.VISIBLE
                 proton.setBackgroundColor(Color.WHITE)
                 electron.setBackgroundColor(Color.WHITE)
                 proton.setTextColor(Color.BLACK)
                 electron.setTextColor(Color.BLACK)
+                points.setTextColor(Color.BLACK)
+                snowflake.visibility = View.VISIBLE
                 iceWorld.visibility = View.VISIBLE
                 iceWorld.setTextColor(Color.BLACK)
             }
@@ -318,6 +339,7 @@ class MainActivity : AppCompatActivity() {
                 electron.setBackgroundColor(Color.WHITE)
                 proton.setTextColor(Color.BLACK)
                 electron.setTextColor(Color.BLACK)
+                points.setTextColor(Color.BLACK)
                 chaos.visibility = View.VISIBLE
                 chaosWorld.visibility = View.VISIBLE
                 chaosWorld.setTextColor(Color.WHITE)
@@ -329,9 +351,9 @@ class MainActivity : AppCompatActivity() {
                 proton.setTextColor(Color.parseColor("#FF333333"))
                 electron.setTextColor(Color.parseColor("#FF333333"))
                 points.setTextColor(Color.parseColor("#FF333333"))
-                coin.alpha = 0.6f
+                quantum.alpha = 0.6f
                 darkWorld.visibility = View.VISIBLE
-                darkWorld.setTextColor(Color.WHITE)
+                darkWorld.setTextColor(Color.parseColor("#FF333333"))
             }
             lifecycleScope.launch {
                 delay(Random.nextLong(6000, 20000))
@@ -339,98 +361,14 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        fun click() {
-            if (world != 99.toUByte()) {
-                numberOfClicks++
-                pointsForNextTeleport--
-                if (pointsForNextTeleport < 1u && world.toUInt() == 0u) {
-                    newTeleport()
-                }
-                money += if (world == 0.toUByte() || world == 2.toUByte())
-                    pointsForClick
-                else if (world == 1.toUByte())
-                    round(pointsForClick * 1.5).toLong()
-                else if (world == 3.toUByte())
-                    ceil(Random.nextDouble() * 2 * pointsForClick).toLong()
-                else if (Random.nextDouble() < 0.5)
-                    pointsForClick
-                else
-                    return
-                updatePoints()
-                soundPool.play(soundId1, 1.0f, 1.0f, 0, 0, 1.0f)
-                points.requestLayout()
-                if (Random.nextInt(1,51) == 50) {
-                    coin.animate()
-                        .scaleX(0.8f)
-                        .scaleY(2f)
-                        .setDuration(100)
-                        .withEndAction {
-                            coin.animate()
-                                .scaleX(2f)
-                                .scaleY(0.8f)
-                                .setDuration(100)
-                                .withEndAction {
-                                    coin.animate()
-                                        .scaleX(1f)
-                                        .scaleY(1f)
-                                        .setDuration(100)
-                                }
-                                .start()
-                        }
-                        .start()
-
-                } else if (Random.nextInt(1,5) < 4) {
-                    coin.animate()
-                        .scaleX(1.1f)
-                        .scaleY(1.1f)
-                        .setDuration(100)
-                        .withEndAction {
-                            coin.animate()
-                                .scaleX(1f)
-                                .scaleY(1f)
-                                .setDuration(100)
-                                .start()
-                        }
-                        .start()
-                } else if (Random.nextInt(1,3) == 2) {
-                    coin.animate()
-                        .scaleX(1.35f)
-                        .scaleY(1.1f)
-                        .setDuration(100)
-                        .withEndAction {
-                            coin.animate()
-                                .scaleX(1f)
-                                .scaleY(1f)
-                                .setDuration(100)
-                                .start()
-                        }
-                        .start()
-                } else {
-                    coin.animate()
-                        .scaleX(1.1f)
-                        .scaleY(1.35f)
-                        .setDuration(100)
-                        .withEndAction {
-                            coin.animate()
-                                .scaleX(1f)
-                                .scaleY(1f)
-                                .setDuration(100)
-                                .start()
-                        }
-                        .start()
-                }
-            }
-        }
-
-
-        coin.visibility = View.GONE
+        quantum.visibility = View.GONE
         points.visibility = View.GONE
         proton.visibility = View.GONE
         electron.visibility = View.GONE
         details.visibility = View.GONE
         lifecycleScope.launch {
             delay(4000)
-            coin.visibility = View.VISIBLE
+            quantum.visibility = View.VISIBLE
             points.visibility = View.VISIBLE
             proton.visibility = View.VISIBLE
             electron.visibility = View.VISIBLE
@@ -443,38 +381,261 @@ class MainActivity : AppCompatActivity() {
             while (true) {
                 delay(Random.nextInt(1000, 22000).toLong())
                 if (world != 4.toUByte())
-                    spawnNeutron()
+                    if (!end)
+                        spawnNeutron()
             }
         }
 
         lifecycleScope.launch {
-                while (isActive) {
-                    if (world == 2.toUByte()) {
-                        delay(Random.nextInt(1000,4000).toLong())
-                        if (world != 4.toUByte()) {
+            while (isActive) {
+                if (world == 2.toUByte()) {
+                    delay(Random.nextInt(1000, 4000).toLong())
+                    if (world != 4.toUByte()) {
+                        if (!end)
                             spawnNeutron()
-                        }
                     }
-                    delay(1000)
                 }
+                delay(1000)
+            }
         }
 
         lifecycleScope.launch {
             delay(4000)
             while (isActive) {
                 delay(Random.nextInt(600, 1200).toLong())
-                pointsForElectrons()
+                if (!end)
+                    pointsForElectrons()
             }
         }
 
-        logo()
-        layout.setOnClickListener {click()}
+        fun newGame() {
+            end = false
+            proton.animate().alpha(1f).setDuration(500).start()
+            electron.animate().alpha(1f).setDuration(500).start()
+            details.animate().alpha(1f).setDuration(500).start()
+            protonPrice = 150
+            electronPrice = 100
+            pointsForClick = 1
+            pointsForElectrons = 0
+            numberOfProtons = 0
+            numberOfElectrons = 0
+        }
+
+        fun end() {
+            end = true
+            nextTeleport()
+            proton.animate().alpha(0f).setDuration(200).start()
+            electron.animate().alpha(0f).setDuration(200).start()
+            details.animate().alpha(0f).setDuration(200).start()
+            lifecycleScope.launch {
+                for (i in 1..42) {
+                    nextTeleport()
+                    soundPool.play(soundId1, 1.0f, 1.0f, 0, 0, 1.0f)
+                    if (Random.nextInt(1, 3) == 2) {
+                        quantum.animate()
+                            .scaleX(1.4f)
+                            .scaleY(1.4f)
+                            .setDuration(100)
+                            .withEndAction {
+                                quantum.animate()
+                                    .scaleX(1f)
+                                    .scaleY(1f)
+                                    .setDuration(100)
+                            }
+                            .start()
+
+                    } else if (Random.nextInt(1, 3) == 2) {
+                        quantum.animate()
+                            .scaleX(1.8f)
+                            .scaleY(1.1f)
+                            .setDuration(100)
+                            .withEndAction {
+                                quantum.animate()
+                                    .scaleX(1f)
+                                    .scaleY(1f)
+                                    .setDuration(100)
+                                    .start()
+                            }
+                            .start()
+                    } else {
+                        quantum.animate()
+                            .scaleX(1.1f)
+                            .scaleY(1.8f)
+                            .setDuration(100)
+                            .withEndAction {
+                                quantum.animate()
+                                    .scaleX(1f)
+                                    .scaleY(1f)
+                                    .setDuration(100)
+                                    .start()
+                            }
+                            .start()
+                    }
+
+                    world = Random.nextInt(1, 5).toUByte()
+                    if (world.toUInt() == 1u) {
+                        layout.setBackgroundColor(Color.RED)
+                        fire.visibility = View.VISIBLE
+                        points.setTextColor(Color.WHITE)
+                    }
+                    if (world.toUInt() == 2u) {
+                        layout.setBackgroundColor(Color.parseColor("#FF00FFFF"))
+                        snowflake.visibility = View.VISIBLE
+                        points.setTextColor(Color.BLACK)
+                    }
+                    if (world.toUInt() == 3u) {
+                        layout.setBackgroundColor(Color.parseColor("#FFCCCCCC"))
+                        chaos.visibility = View.VISIBLE
+                        points.setTextColor(Color.BLACK)
+                    }
+                    if (world.toUInt() == 4u) {
+                        layout.setBackgroundColor(Color.BLACK)
+                        points.setTextColor(Color.parseColor("#FF333333"))
+                        quantum.alpha = 0.6f
+                    }
+                    delay(200)
+                }
+            }
+            lifecycleScope.launch {
+                for (i in 1..50) {
+                    points.text = formatNumberWithSpaces(
+                        Random.nextLong(
+                            0,
+                            999_999_999_999_999_999
+                        )
+                    ).toString()
+                    delay(100)
+                }
+            }
+            lifecycleScope.launch {
+                money = 100000000000000000
+                delay(5100)
+                points.text = formatNumberWithSpaces(money).toString()
+                var n = 16
+                for (i in 1..16) {
+                    delay(200)
+                    money -= ("9" + "0".repeat(n)).toLong()
+                    points.text = formatNumberWithSpaces(money).toString()
+                    n--
+                }
+                nextTeleport()
+                money = 0
+                points.text = formatNumberWithSpaces(money).toString()
+                delay(1000)
+                soundPool.play(soundId3, 10.0f, 10.0f, 100, 0, 10f)
+                quantum.animate().scaleX(4.0f).scaleY(3.0f).alpha(0f).setDuration(400).start()
+                points.animate().alpha(0f).setDuration(150).start()
+
+                for (i in 1..50) {
+                    delay(50)
+                    spawnNeutron()
+                }
+
+                delay(1500)
+                endText.animate().alpha(1f).setDuration(500).start()
+                while (end) {
+                    delay(Random.nextInt(500,2500).toLong())
+                    spawnNeutron()
+                }
+            }
+        }
+
+            fun click() {
+                if (world != 99.toUByte()) {
+                    numberOfClicks++
+                    pointsForNextTeleport--
+                    if (pointsForNextTeleport < 1u && world.toUInt() == 0u) {
+                        newTeleport()
+                    }
+                    money += if (world == 0.toUByte() || world == 2.toUByte())
+                        pointsForClick
+                    else if (world == 1.toUByte())
+                        round(pointsForClick * 1.5).toLong()
+                    else if (world == 3.toUByte())
+                        ceil(Random.nextDouble() * 2 * pointsForClick).toLong()
+                    else if (Random.nextDouble() < 0.5)
+                        pointsForClick
+                    else
+                        return
+                    updatePoints()
+                    soundPool.play(soundId1, 1.0f, 1.0f, 0, 0, 1.0f)
+                    points.requestLayout()
+                    if (Random.nextInt(1, 51) == 50) {
+                        quantum.animate()
+                            .scaleX(0.8f)
+                            .scaleY(2f)
+                            .setDuration(100)
+                            .withEndAction {
+                                quantum.animate()
+                                    .scaleX(2f)
+                                    .scaleY(0.8f)
+                                    .setDuration(100)
+                                    .withEndAction {
+                                        quantum.animate()
+                                            .scaleX(1f)
+                                            .scaleY(1f)
+                                            .setDuration(100)
+                                    }
+                                    .start()
+                            }
+                            .start()
+
+                    } else if (Random.nextInt(1, 5) < 4) {
+                        quantum.animate()
+                            .scaleX(1.1f)
+                            .scaleY(1.1f)
+                            .setDuration(100)
+                            .withEndAction {
+                                quantum.animate()
+                                    .scaleX(1f)
+                                    .scaleY(1f)
+                                    .setDuration(100)
+                                    .start()
+                            }
+                            .start()
+                    } else if (Random.nextInt(1, 3) == 2) {
+                        quantum.animate()
+                            .scaleX(1.35f)
+                            .scaleY(1.1f)
+                            .setDuration(100)
+                            .withEndAction {
+                                quantum.animate()
+                                    .scaleX(1f)
+                                    .scaleY(1f)
+                                    .setDuration(100)
+                                    .start()
+                            }
+                            .start()
+                    } else {
+                        quantum.animate()
+                            .scaleX(1.1f)
+                            .scaleY(1.35f)
+                            .setDuration(100)
+                            .withEndAction {
+                                quantum.animate()
+                                    .scaleX(1f)
+                                    .scaleY(1f)
+                                    .setDuration(100)
+                                    .start()
+                            }
+                            .start()
+                    }
+                }
+                if (money > 999_999_999_999_999_999)
+                    end()
+            }
 
 
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
-            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
+            logo()
+            layout.setOnClickListener {
+                if (!end) click()
+            }
+
+
+            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+                val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+                insets
+            }
         }
     }
-}
