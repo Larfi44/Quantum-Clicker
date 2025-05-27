@@ -1,3 +1,22 @@
 <resources>
-    <string name="app_name">Quantum Clicker</string>
+        <string name="app_name" translatable="false">Quantum Clicker</string>
+        <string name="start_new_game">Start new game</string>
+        <string name="_0" translatable="false">0</string>
+        <string name="buy_proton_n_150">Buy proton (150)</string>
+        <string name="buy_electron_n_100">Buy electron\n(100)</string>
+        <string name="fire_world_n_more_point_for_click">Fire World\n(more point for click)</string>
+        <string name="ice_world_n_more_neutrons">Ice World\n(more neutrons)</string>
+        <string name="chaos_world_n_random_points_for_click">Chaos World \n(Random points for click)</string>
+        <string name="dark_world_it_s_difficult_nto_click_on_the_quantum">Dark World (It\'s difficult\nto click on the quantum)</string>
+        <string name="the_end_nthanks_for_playing_n_by_yarik_studio">The End!\nThanks for playing!\n By Yarik Studio</string>
+        <string name="number_of_neutrons">Number of neutrons:</string>
+        <string name="points_for_click">Points for click:</string>
+        <string name="points_for_electrons">Points for electrons:</string>
+        <string name="number_of_protons">Number of protons:</string>
+        <string name="number_of_electrons">Number of electrons:</string>
+        <string name="number_of_clicks">Number of clicks:</string>
+        <string name="protons_give_more_points_per_click_on_the_quantum_and_neutron">Protons give more points per click on the quantum and neutron</string>
+        <string name="electrons_click_on_the_quantum">Electrons click on the quantum</string>
+        <string name="neutrons_fall_from_the_sky_and_they_can_be_collected">Neutrons are dropped on top and can be taken</string>
+
 </resources>

@@ -50,6 +50,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var chaosWorld: TextView
     private lateinit var darkWorld: TextView
     private lateinit var endText: TextView
+    private lateinit var startNewGame: Button
 
     private var money: Long = 0
     private var protonPrice: Long = 150
@@ -66,12 +67,54 @@ class MainActivity : AppCompatActivity() {
     private var pointsForNextTeleport: UByte = 0U
     private var world: UByte = 99u
     private var end: Boolean = false
+    private var lang: String = Locale.getDefault().language
+
+    companion object {
+        private const val PREFS_NAME = "GamePrefs"
+        private const val KEY_MONEY = "money"
+        private const val KEY_POINTS_FOR_CLICK = "pointsForClick"
+        private const val KEY_POINTS_FOR_ELECTRONS = "pointsForElectrons"
+        private const val KEY_ELECTRON_PRICE = "electronPrice"
+        private const val KEY_PROTON_PRICE = "protonPrice"
+        private const val KEY_CLICKS = "numberOfClicks"
+        private const val KEY_ELECTRONS = "numberOfElectrons"
+        private const val KEY_PROTONS = "numberOfProtons"
+        private const val KEY_NEUTRONS = "numberOfNeutrons"
+    }
 
     @SuppressLint("MissingInflatedId")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+
+        if (lang != "ru")
+            lang = "en"
+
+        fun formatNumberWithSpaces(number: Long): String {
+            val formatter = DecimalFormat("###,###", DecimalFormatSymbols(Locale.getDefault()))
+            formatter.groupingSize = 3
+            return formatter.format(number).replace(",", " ")
+        }
+
+        fun updatePoints() {
+            points.text = formatNumberWithSpaces(money).toString()
+            if (lang == "en") {
+                proton.text = "buy proton\n($protonPrice)"
+                electron.text = "buy electron\n($electronPrice)"
+            } else {
+                proton.text = "купить протон\n($protonPrice)"
+                electron.text = "купить электрон\n($electronPrice)"
+            }
+        }
+
+        fun isDarkTheme(context: Context): Boolean {
+            val currentNightMode = context.resources.configuration.uiMode and
+                    Configuration.UI_MODE_NIGHT_MASK
+            return currentNightMode == Configuration.UI_MODE_NIGHT_YES
+        }
+
+        loadGameState()
 
         layout = findViewById(R.id.main)
         quantum = findViewById(R.id.Coin)
@@ -88,6 +131,7 @@ class MainActivity : AppCompatActivity() {
         chaosWorld = findViewById(R.id.ChaosWorld)
         darkWorld = findViewById(R.id.DarkWorld)
         endText = findViewById(R.id.EndText)
+        startNewGame = findViewById(R.id.StartNewGame)
 
         intent = Intent(this, Details::class.java)
 
@@ -96,10 +140,23 @@ class MainActivity : AppCompatActivity() {
         soundId2 = soundPool.load(this, R.raw.teleport, 1)
         soundId3 = soundPool.load(this, R.raw.explosion, 1)
 
-        proton.text = "buy proton ($protonPrice)"
-        electron.text = "buy electron ($electronPrice)"
+        if (lang == "en") {
+            proton.text = "buy proton\n($protonPrice)"
+            electron.text = "buy electron\n($electronPrice)"
+        }
+        if (lang == "ru") {
+            proton.text = "купить протон\n($protonPrice)"
+            electron.text = "купить электрон\n($electronPrice)"
+        }
         Energy.alpha = 0f
         endText.alpha = 0f
+        endText.visibility = View.VISIBLE
+        startNewGame.alpha = 0f
+        startNewGame.visibility = View.GONE
+        if (isDarkTheme(this))
+            startNewGame.setBackgroundColor(Color.WHITE)
+        else
+            startNewGame.setBackgroundColor(Color.BLACK)
         fire.visibility = View.GONE
         snowflake.visibility = View.GONE
         chaos.visibility = View.GONE
@@ -108,16 +165,7 @@ class MainActivity : AppCompatActivity() {
         chaosWorld.visibility = View.GONE
         darkWorld.visibility = View.GONE
 
-        window.attributes = window.attributes.apply {
-            rotationAnimation = WindowManager.LayoutParams.ROTATION_ANIMATION_JUMPCUT
-            requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
-        }
-
-        fun formatNumberWithSpaces(number: Long): String {
-            val formatter = DecimalFormat("###,###", DecimalFormatSymbols(Locale.getDefault()))
-            formatter.groupingSize = 3
-            return formatter.format(number).replace(",", " ")
-        }
+        requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
         details.setOnClickListener {
             if (!end) {
@@ -141,10 +189,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        fun updatePoints() {
-            points.text = formatNumberWithSpaces(money).toString()
-        }
-
         proton.setOnClickListener {
             if (money >= protonPrice) {
                 numberOfProtons++
@@ -152,7 +196,13 @@ class MainActivity : AppCompatActivity() {
                 money -= protonPrice
                 pointsForClick *= 2
                 protonPrice *= 2
-                proton.text = "buy proton \n(" + formatNumberWithSpaces(protonPrice) + ")"
+                if (lang == "en") {
+                    proton.text = "buy proton\n($protonPrice)"
+                }
+                if (lang == "ru") {
+                    proton.text = "купить протон\n($protonPrice)"
+                }
+                saveGameState()
                 updatePoints()
                 soundPool.play(soundId1, 1.0f, 1.0f, 1, 0, 0.6f)
             }
@@ -179,7 +229,13 @@ class MainActivity : AppCompatActivity() {
                 else
                     pointsForElectrons = 4
                 electronPrice *= 2
-                electron.text = "buy electron \n(" + formatNumberWithSpaces(electronPrice) + ")"
+                if (lang == "en") {
+                    electron.text = "buy electron\n($electronPrice)"
+                }
+                if (lang == "ru") {
+                    electron.text = "купить электрон\n($electronPrice)"
+                }
+                saveGameState()
                 updatePoints()
                 soundPool.play(soundId1, 1.0f, 1.0f, 1, 0, 0.6f)
                 electron.animate()
@@ -244,12 +300,6 @@ class MainActivity : AppCompatActivity() {
                     updatePoints()
                 }
             }
-        }
-
-        fun isDarkTheme(context: Context): Boolean {
-            val currentNightMode = context.resources.configuration.uiMode and
-                    Configuration.UI_MODE_NIGHT_MASK
-            return currentNightMode == Configuration.UI_MODE_NIGHT_YES
         }
 
         fun logo() {
@@ -342,7 +392,7 @@ class MainActivity : AppCompatActivity() {
                 points.setTextColor(Color.BLACK)
                 chaos.visibility = View.VISIBLE
                 chaosWorld.visibility = View.VISIBLE
-                chaosWorld.setTextColor(Color.WHITE)
+                chaosWorld.setTextColor(Color.BLACK)
             }
             if (world.toUInt() == 4u) {
                 layout.setBackgroundColor(Color.BLACK)
@@ -409,16 +459,40 @@ class MainActivity : AppCompatActivity() {
         }
 
         fun newGame() {
-            end = false
-            proton.animate().alpha(1f).setDuration(500).start()
-            electron.animate().alpha(1f).setDuration(500).start()
-            details.animate().alpha(1f).setDuration(500).start()
-            protonPrice = 150
-            electronPrice = 100
-            pointsForClick = 1
-            pointsForElectrons = 0
-            numberOfProtons = 0
-            numberOfElectrons = 0
+            lifecycleScope.launch {
+                end = false
+                world = 99u
+                endText.animate().alpha(0f).setDuration(500).start()
+                startNewGame.animate().alpha(0f).setDuration(500).start()
+                delay(3000)
+                startNewGame.visibility = View.GONE
+                quantum.scaleX = 1f
+                quantum.scaleY = 1f
+                money = 0
+                points.text = formatNumberWithSpaces(money).toString()
+                protonPrice = 150
+                electronPrice = 100
+                pointsForClick = 1
+                pointsForElectrons = 0
+                numberOfProtons = 0
+                numberOfElectrons = 0
+                world = 0u
+                delay(500)
+                quantum.animate().alpha(1f).setDuration(500).start()
+                delay(500)
+                if (lang == "en") {
+                    proton.text = "buy proton\n($protonPrice)"
+                    electron.text = "buy electron\n($electronPrice)"
+                }
+                if (lang == "ru") {
+                    proton.text = "купить протон\n($protonPrice)"
+                    electron.text = "купить протон\n($electronPrice)"
+                }
+                points.animate().alpha(1f).setDuration(500).start()
+                proton.animate().alpha(1f).setDuration(500).start()
+                electron.animate().alpha(1f).setDuration(500).start()
+                details.animate().alpha(1f).setDuration(500).start()
+            }
         }
 
         fun end() {
@@ -531,8 +605,16 @@ class MainActivity : AppCompatActivity() {
                     spawnNeutron()
                 }
 
-                delay(1500)
+                delay(2000)
                 endText.animate().alpha(1f).setDuration(500).start()
+                delay(1000)
+                startNewGame.bringToFront()
+                startNewGame.visibility = View.VISIBLE
+                startNewGame.animate().alpha(1f).setDuration(500).start()
+                startNewGame.setOnClickListener {
+                    soundPool.play(soundId1, 1.0f, 1.0f, 1, 0, 0.5f)
+                    newGame()
+                }
                 while (end) {
                     delay(Random.nextInt(500,2500).toLong())
                     spawnNeutron()
@@ -557,6 +639,7 @@ class MainActivity : AppCompatActivity() {
                         pointsForClick
                     else
                         return
+                    saveGameState()
                     updatePoints()
                     soundPool.play(soundId1, 1.0f, 1.0f, 0, 0, 1.0f)
                     points.requestLayout()
@@ -638,4 +721,38 @@ class MainActivity : AppCompatActivity() {
                 insets
             }
         }
+
+    override fun onPause() {
+        super.onPause()
+        saveGameState()
     }
+
+    private fun saveGameState() {
+        val sharedPref = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        with(sharedPref.edit()) {
+            putLong(KEY_MONEY, money)
+            putLong(KEY_POINTS_FOR_CLICK, pointsForClick.toLong())
+            putLong(KEY_POINTS_FOR_ELECTRONS, pointsForElectrons.toLong())
+            putLong(KEY_ELECTRON_PRICE, electronPrice)
+            putLong(KEY_PROTON_PRICE, protonPrice)
+            putInt(KEY_CLICKS, numberOfClicks.toInt())
+            putInt(KEY_ELECTRONS, numberOfElectrons.toInt())
+            putInt(KEY_PROTONS, numberOfProtons.toInt())
+            putInt(KEY_NEUTRONS, numberOfNeutrons.toInt())
+            apply()
+        }
+    }
+
+    private fun loadGameState() {
+        val sharedPref = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        money = sharedPref.getLong(KEY_MONEY, 0)
+        pointsForClick = sharedPref.getLong(KEY_POINTS_FOR_CLICK, 1)
+        pointsForElectrons = sharedPref.getLong(KEY_POINTS_FOR_ELECTRONS, 1)
+        electronPrice = sharedPref.getLong(KEY_ELECTRON_PRICE, 100)
+        protonPrice = sharedPref.getLong(KEY_PROTON_PRICE, 150)
+        numberOfClicks = sharedPref.getInt(KEY_CLICKS, 0).toShort()
+        numberOfElectrons = sharedPref.getInt(KEY_ELECTRONS, 0).toShort()
+        numberOfProtons = sharedPref.getInt(KEY_PROTONS, 0).toShort()
+        numberOfNeutrons = sharedPref.getInt(KEY_NEUTRONS, 0).toShort()
+    }
+}
