@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-        if (lang != "ru")
+        if (lang != "ru" && lang != "zh")
             lang = "en"
 
         fun formatNumberWithSpaces(number: Long): String {
@@ -102,9 +102,14 @@ class MainActivity : AppCompatActivity() {
             if (lang == "en") {
                 proton.text = "buy proton\n($protonPrice)"
                 electron.text = "buy electron\n($electronPrice)"
-            } else {
+            }
+            if (lang == "ru") {
                 proton.text = "купить протон\n($protonPrice)"
                 electron.text = "купить электрон\n($electronPrice)"
+            }
+            if (lang == "zh") {
+                proton.text = "购买质子\n($protonPrice)"
+                electron.text = "购买电子\n($electronPrice)"
             }
         }
 
@@ -147,6 +152,10 @@ class MainActivity : AppCompatActivity() {
         if (lang == "ru") {
             proton.text = "купить протон\n($protonPrice)"
             electron.text = "купить электрон\n($electronPrice)"
+        }
+        if (lang == "zh") {
+            proton.text = "购买质子\n($protonPrice)"
+            electron.text = "购买电子\n($electronPrice)"
         }
         Energy.alpha = 0f
         endText.alpha = 0f
@@ -202,6 +211,9 @@ class MainActivity : AppCompatActivity() {
                 if (lang == "ru") {
                     proton.text = "купить протон\n($protonPrice)"
                 }
+                if (lang == "zh") {
+                    proton.text = "购买质子\n($protonPrice)"
+                }
                 saveGameState()
                 updatePoints()
                 soundPool.play(soundId1, 1.0f, 1.0f, 1, 0, 0.6f)
@@ -234,6 +246,9 @@ class MainActivity : AppCompatActivity() {
                 }
                 if (lang == "ru") {
                     electron.text = "купить электрон\n($electronPrice)"
+                }
+                if (lang == "zh") {
+                    electron.text = "购买电子\n($electronPrice)"
                 }
                 saveGameState()
                 updatePoints()
@@ -488,6 +503,10 @@ class MainActivity : AppCompatActivity() {
                     proton.text = "купить протон\n($protonPrice)"
                     electron.text = "купить протон\n($electronPrice)"
                 }
+                if (lang == "zh") {
+                    proton.text = "购买质子\n($protonPrice)"
+                    electron.text = "购买电子\n($electronPrice)"
+                }
                 points.animate().alpha(1f).setDuration(500).start()
                 proton.animate().alpha(1f).setDuration(500).start()
                 electron.animate().alpha(1f).setDuration(500).start()
@@ -713,7 +732,6 @@ class MainActivity : AppCompatActivity() {
             layout.setOnClickListener {
                 if (!end) click()
             }
-
 
             ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
                 val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

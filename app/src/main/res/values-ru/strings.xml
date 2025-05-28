@@ -3,11 +3,11 @@
     <string name="start_new_game">" Начать новую игру"</string>
     <string name="buy_proton_n_150">Купить протон (150)</string>
     <string name="buy_electron_n_100">Купить электрон\n(100)</string>
-    <string name="fire_world_n_more_point_for_click">Огненный мир\n(больше денег за клик)</string>
-    <string name="ice_world_n_more_neutrons">Мир льда\n(больше нейтронов)</string>
-    <string name="chaos_world_n_random_points_for_click">Мир хаоса\n(Случайные деньги за клик)</string>
-    <string name="dark_world_it_s_difficult_nto_click_on_the_quantum">Мир тьмы (сложно\nкликнуть по квантуму)</string>
-    <string name="the_end_nthanks_for_playing_n_by_yarik_studio">Конец!\nСпасибо за игру!\nОт Yarik Studio</string>
+    <string name="fire_world_n_more_point_for_click">Огненный мир (больше денег за клик)</string>
+    <string name="ice_world_n_more_neutrons">Мир льда (больше нейтронов)</string>
+    <string name="chaos_world_n_random_points_for_click">Мир хаоса (Случайные деньги за клик)</string>
+    <string name="dark_world_it_s_difficult_nto_click_on_the_quantum">Мир тьмы (сложно кликнуть по квантуму)</string>
+    <string name="the_end_nthanks_for_playing_n_by_yarik_studio">Конец! Спасибо за игру! От Yarik Studio</string>
     <string name="number_of_neutrons">Количество нейтронов:</string>
     <string name="points_for_click">Деньги за клик:</string>
     <string name="points_for_electrons">Деньги за электроны:</string>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="start_new_game">开始新游戏</string>
+    <string name="buy_proton_n_150">"购买质子 "</string>
+    <string name="buy_electron_n_100">购买电子</string>
+    <string name="fire_world_n_more_point_for_click">火焰世界</string>
+    <string name="ice_world_n_more_neutrons">冰雪世界</string>
+    <string name="chaos_world_n_random_points_for_click">混沌世界</string>
+    <string name="dark_world_it_s_difficult_nto_click_on_the_quantum">黑暗世界</string>
+    <string name="the_end_nthanks_for_playing_n_by_yarik_studio">结束！\n谢谢游玩！\n由 Yarik Studio 制作</string>
+    <string name="number_of_neutrons">中子数量：</string>
+    <string name="points_for_click">每次点击金钱：</string>
+    <string name="points_for_electrons">电子收益：</string>
+    <string name="number_of_protons">质子数量：</string>
+    <string name="number_of_electrons">电子数量：</string>
+    <string name="number_of_clicks">点击次数：</string>
+    <string name="protons_give_more_points_per_click_on_the_quantum_and_neutron">质子提供点击量子和中子时的\n金钱</string>
+    <string name="electrons_click_on_the_quantum">电子会自动点击量子</string>
+    <string name="neutrons_fall_from_the_sky_and_they_can_be_collected">中子会从上方掉落并可以被收集</string>
+</resources>
