@@ -173,8 +173,6 @@ class MainActivity : AppCompatActivity() {
         endText.visibility = View.VISIBLE
         startNewGame.alpha = 0f
         startNewGame.visibility = View.GONE
-        if (isDarkTheme(this))
-            startNewGame.setBackgroundColor(Color.WHITE)
         fire.visibility = View.GONE
         snowflake.visibility = View.GONE
         chaos.visibility = View.GONE
@@ -182,6 +180,9 @@ class MainActivity : AppCompatActivity() {
         iceWorld.visibility = View.GONE
         chaosWorld.visibility = View.GONE
         darkWorld.visibility = View.GONE
+
+        if (isDarkTheme(this))
+            startNewGame.setBackgroundColor(Color.WHITE)
 
         requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
 
@@ -370,12 +371,15 @@ class MainActivity : AppCompatActivity() {
             chaosWorld.visibility = View.GONE
             darkWorld.visibility = View.GONE
             if (isDarkTheme(this)) {
+                layout.setBackgroundColor(Color.parseColor("#121212"));
                 points.setTextColor(Color.WHITE)
                 proton.setBackgroundColor(Color.WHITE)
                 electron.setBackgroundColor(Color.WHITE)
                 proton.setTextColor(Color.BLACK)
                 electron.setTextColor(Color.BLACK)
+                // #121212
             } else {
+                layout.setBackgroundColor(Color.WHITE)
                 points.setTextColor(Color.BLACK)
                 proton.setBackgroundColor(Color.BLACK)
                 electron.setBackgroundColor(Color.BLACK)
@@ -385,7 +389,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         fun newTeleport() {
-            world = Random.nextInt(1, 2).toUByte()
+            world = Random.nextInt(1, 5).toUByte()
             soundPool.play(soundId2, 2.0f, 2.0f, 5, 0, 1f)
             if (world.toUInt() == 1u) {
                 layout.setBackgroundColor(Color.RED)
