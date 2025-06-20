@@ -88,6 +88,40 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
+        layout = findViewById(R.id.main)
+        quantum = findViewById(R.id.Coin)
+        points = findViewById(R.id.Points)
+        proton = findViewById(R.id.Proton)
+        electron = findViewById(R.id.Electron)
+        details = findViewById(R.id.Details)
+        Energy = findViewById(R.id.Energy)
+        fire = findViewById(R.id.Fire)
+        snowflake = findViewById(R.id.Snowflake)
+        chaos = findViewById(R.id.Chaos)
+        fireWorld = findViewById(R.id.FireWorld)
+        iceWorld = findViewById(R.id.IceWorld)
+        chaosWorld = findViewById(R.id.ChaosWorld)
+        darkWorld = findViewById(R.id.DarkWorld)
+        endText = findViewById(R.id.EndText)
+        startNewGame = findViewById(R.id.StartNewGame)
+
+        intent = Intent(this, Details::class.java)
+
+        soundPool = SoundPool.Builder().setMaxStreams(5).build()
+        soundId1 = soundPool.load(this, R.raw.quantum_clicker_clickaudio, 1)
+        soundId2 = soundPool.load(this, R.raw.teleport, 1)
+        soundId3 = soundPool.load(this, R.raw.explosion, 1)
+
+        loadGameState()
+
+        fun isTablet(context: Context): Boolean {
+            return context.resources.configuration.smallestScreenWidthDp >= 600
+        }
+
+        fun dpToPx(context: Context, dp: Float): Float {
+            return dp * context.resources.displayMetrics.density
+        }
+
         if (lang != "ru" && lang != "zh")
             lang = "en"
 
@@ -113,37 +147,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        updatePoints()
+
         fun isDarkTheme(context: Context): Boolean {
             val currentNightMode = context.resources.configuration.uiMode and
                     Configuration.UI_MODE_NIGHT_MASK
             return currentNightMode == Configuration.UI_MODE_NIGHT_YES
         }
-
-        loadGameState()
-
-        layout = findViewById(R.id.main)
-        quantum = findViewById(R.id.Coin)
-        points = findViewById(R.id.Points)
-        proton = findViewById(R.id.Proton)
-        electron = findViewById(R.id.Electron)
-        details = findViewById(R.id.Details)
-        Energy = findViewById(R.id.Energy)
-        fire = findViewById(R.id.Fire)
-        snowflake = findViewById(R.id.Snowflake)
-        chaos = findViewById(R.id.Chaos)
-        fireWorld = findViewById(R.id.FireWorld)
-        iceWorld = findViewById(R.id.IceWorld)
-        chaosWorld = findViewById(R.id.ChaosWorld)
-        darkWorld = findViewById(R.id.DarkWorld)
-        endText = findViewById(R.id.EndText)
-        startNewGame = findViewById(R.id.StartNewGame)
-
-        intent = Intent(this, Details::class.java)
-
-        soundPool = SoundPool.Builder().setMaxStreams(5).build()
-        soundId1 = soundPool.load(this, R.raw.quantum_clicker_clickaudio, 1)
-        soundId2 = soundPool.load(this, R.raw.teleport, 1)
-        soundId3 = soundPool.load(this, R.raw.explosion, 1)
 
         if (lang == "en") {
             proton.text = "buy proton\n($protonPrice)"
@@ -157,6 +167,7 @@ class MainActivity : AppCompatActivity() {
             proton.text = "购买质子\n($protonPrice)"
             electron.text = "购买电子\n($electronPrice)"
         }
+
         Energy.alpha = 0f
         endText.alpha = 0f
         endText.visibility = View.VISIBLE
@@ -164,8 +175,6 @@ class MainActivity : AppCompatActivity() {
         startNewGame.visibility = View.GONE
         if (isDarkTheme(this))
             startNewGame.setBackgroundColor(Color.WHITE)
-        else
-            startNewGame.setBackgroundColor(Color.BLACK)
         fire.visibility = View.GONE
         snowflake.visibility = View.GONE
         chaos.visibility = View.GONE
@@ -318,7 +327,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         fun logo() {
-
             val YarikStudio: ImageView = findViewById(R.id.Yarik__Studio)
             val logo: ImageView = findViewById(R.id.Logo)
 
@@ -338,10 +346,13 @@ class MainActivity : AppCompatActivity() {
                 YarikStudio.animate().rotationX(360f).setDuration(1000).start()
                 delay(200)
                 logo.animate().alpha(1f).setDuration(1000).start()
-                logo.animate().translationX(150f).setDuration(500).start()
+
+                val translationXPx = dpToPx(this@MainActivity, 100f)
+                logo.animate().translationX(translationXPx).setDuration(700).start()
                 logo.animate().rotationBy(720f).setDuration(1500).start()
+
                 delay(2000)
-                YarikStudio.animate().alpha(0f).setDuration(750).start()
+                YarikStudio.animate().alpha(0f).setDuration(700).start()
                 logo.animate().alpha(0f).setDuration(750).start()
             }
         }
@@ -359,14 +370,12 @@ class MainActivity : AppCompatActivity() {
             chaosWorld.visibility = View.GONE
             darkWorld.visibility = View.GONE
             if (isDarkTheme(this)) {
-                layout.setBackgroundColor(Color.BLACK)
                 points.setTextColor(Color.WHITE)
                 proton.setBackgroundColor(Color.WHITE)
                 electron.setBackgroundColor(Color.WHITE)
                 proton.setTextColor(Color.BLACK)
                 electron.setTextColor(Color.BLACK)
             } else {
-                layout.setBackgroundColor(Color.WHITE)
                 points.setTextColor(Color.BLACK)
                 proton.setBackgroundColor(Color.BLACK)
                 electron.setBackgroundColor(Color.BLACK)
@@ -376,7 +385,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         fun newTeleport() {
-            world = Random.nextInt(1, 5).toUByte()
+            world = Random.nextInt(1, 2).toUByte()
             soundPool.play(soundId2, 2.0f, 2.0f, 5, 0, 1f)
             if (world.toUInt() == 1u) {
                 layout.setBackgroundColor(Color.RED)
@@ -726,7 +735,6 @@ class MainActivity : AppCompatActivity() {
                 if (money > 999_999_999_999_999_999)
                     end()
             }
-
 
             logo()
             layout.setOnClickListener {
